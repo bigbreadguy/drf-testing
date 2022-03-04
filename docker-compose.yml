@@ -1,0 +1,21 @@
+version: "3"
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80/tcp"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - web
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+  web:
+#    image: deepingcompany/deeping:latest
+    image: drf-testing:latest
+    container_name: web
+    command: gunicorn drf.wsgi:application --forwarded-allow-ips="*" --bind 0.0.0.0:8000
+#    volumes:
+#      - ./static:/usr/src/app/staticfiles
+    expose:
+      - "8000"
